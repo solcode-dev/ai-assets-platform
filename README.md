@@ -101,26 +101,6 @@ docker-compose up -d
 
 ## 📊 ERD (Entity Relationship Diagram)
 
-```mermaid
-erDiagram
-    ASSETS {
-        int id PK "Primary Key"
-        varchar job_id UK "작업 고유 ID (Unique)"
-        enum status "작업 상태 (PENDING, PROCESSING, COMPLETED, FAILED)"
-        enum asset_type "에셋 타입 (IMAGE, VIDEO)"
-        text prompt "생성/검색 프롬프트"
-        varchar model "사용된 모델명"
-        varchar file_path "결과 파일 경로"
-        vector embedding_kure "KURE-v1 임베딩 벡터 (1024차원)"
-        text search_document "검색용 문서 (Vision LLM 설명)"
-        int width "이미지 너비"
-        int height "이미지 높이"
-        text error_message "작업 실패 시 에러 메시지"
-        timestamp created_at "생성 일시"
-        timestamp updated_at "수정 일시"
-    }
-```
-
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | INTEGER | Primary Key |
@@ -170,5 +150,6 @@ sequenceDiagram
     DB-->>API: 최신 상태 반환
     API-->>Client: 결과 전달 (URL 포함)
 ```
+
 
 
