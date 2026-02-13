@@ -1,4 +1,3 @@
-
 services:
   db:
     image: pgvector/pgvector:pg15
@@ -32,6 +31,7 @@ services:
 
   backend:
     build: ./backend
+    restart: always  # 실패 시 자동 재시작 추가
     ports:
       - "8000:8000"
     environment:
@@ -55,10 +55,10 @@ services:
       - ./backend/credentials:/app/credentials # Unified credentials directory
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s    # 너무 빈번한 체크 방지
+      timeout: 10s
       retries: 5
-      start_period: 300s
+      start_period: 300s # 5분으로 대폭 연장
 
   worker:
     build: ./backend

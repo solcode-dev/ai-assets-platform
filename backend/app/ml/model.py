@@ -57,8 +57,20 @@ class EmbeddingModel:
             
             if not model_path.exists():
                 logger.info(f"📦 ONNX 모델 변환 및 내보내기 시작 (경로: {self.CACHE_DIR})...")
-                # optimum.exporters.onnx.main_export를 사용하여 직접 변환
-                # export=True 옵션의 숨겨진 임시 파일 오류를 방지하기 위함
+                
+                # 변환 전 기존 잔재 삭제 (안전한 재시작을 위함)
+                import shutil
+                if os.path.exists(self.CACHE_DIR):
+                    for filename in os.listdir(self.CACHE_DIR):
+                        file_path = os.path.join(self.CACHE_DIR, filename)
+                        try:
+                            if os.path.isfile(file_path) or os.path.islink(file_path):
+                                os.unlink(file_path)
+                            elif os.path.isdir(file_path):
+                                shutil.rmtree(file_path)
+                        except Exception as e:
+                            logger.warn(f"Failed to delete {file_path}. Reason: {e}")
+
                 main_export(
                     self.MODEL_ID,
                     output=Path(self.CACHE_DIR),
