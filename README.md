@@ -1,6 +1,6 @@
-# [KRAFTON 채용 과제] AI 멀티모달 콘텐츠 생성 플랫폼 구축
+# AI 멀티모달 콘텐츠 생성 플랫폼 구축
 
-본 프로젝트는 KRAFTON의 과제 결과물로써, Google Vertex AI 의 멀티모달 생성 AI 모델(Imagen, Veo)을 활용해 게임 에셋을 생성하고 관리하는 통합 플랫폼입니다.
+Google Vertex AI 의 멀티모달 생성 AI 모델(Imagen, Veo)을 활용해 게임 에셋을 생성하고 관리하는 통합 플랫폼입니다.
 
 ## Key Features
 - **의미 기반 검색 (Semantic Search)**: 단순 키워드 매칭이 아닌, `pgvector`를 활용한 벡터 유사도 검색
@@ -48,10 +48,9 @@
 ```bash
 docker-compose up -d
 ```
-### 3. **마이그레이션 적용:**
-   ```bash
-   alembic upgrade head
-   ```
+### 3. credentials 추가
+- `backend/credentials`에 Vertex AI 인증 정보 추가(json)
+
 
 ### 3. API 문서 확인
 서버 실행 후 아래 주소에서 Swagger 문서를 확인할 수 있습니다.
@@ -171,4 +170,5 @@ sequenceDiagram
     DB-->>API: 최신 상태 반환
     API-->>Client: 결과 전달 (URL 포함)
 ```
+
 
