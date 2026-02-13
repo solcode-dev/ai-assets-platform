@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "Backend",
+      "path": "backend"
+    },
+    {
+      "name": "Frontend",
+      "path": "frontend"
+    },
+    {
+      "name": "Root (Config)",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "backend": false,
+      "frontend": false
+    },
+    "powershell.cwd": "Root (Config)"
+  }
+}

@@ -1,0 +1,14 @@
+[run]
+# .coveragerc - Coverage configuration (Not a Python file)
+# Multiple patterns can be separated by commas or newlines
+omit = **/__init__.py, app/core/config.py, app/infrastructure/database.py, app/main.py, tests/*
+
+[report]
+# Regular expressions for lines to exclude from consideration
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if __name__ == .__main__.:
+    raise NotImplementedError
+    if TYPE_CHECKING:

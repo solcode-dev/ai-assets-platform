@@ -1,0 +1,29 @@
+services:
+  test-db:
+    image: postgres:15-alpine
+    container_name: krafton_test_db
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: test_db
+    ports:
+      - "5433:5432"  # 본 DB와 포트 충돌 방지
+    volumes:
+      - test_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # localstack:  # S3 Mock (참고용 - 필요 시 주석 해제)
+  #   image: localstack/localstack:latest
+  #   container_name: krafton_localstack
+  #   environment:
+  #     SERVICES: s3
+  #     DEFAULT_REGION: us-east-1
+  #   ports:
+  #     - "4566:4566"
+
+volumes:
+  test_db_data:

@@ -1,0 +1,33 @@
+{
+  "name": "Backends Development (All)",
+  "dockerComposeFile": "../../../docker-compose.yml",
+  "service": "backend",
+  "overrideCommand": true,       // 2. 기존 CMD(uvicorn 실행)를 무시하고 대기 상태로 만듦
+  "runServices": [
+    "db",
+    "redis",
+    "backend",
+    "frontend"
+    // "worker"
+  ],
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.languageServer": "Pylance",
+        "python.analysis.extraPaths": [
+          "/app"
+        ],
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "remoteUser": "root"
+}
