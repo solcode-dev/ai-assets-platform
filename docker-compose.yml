@@ -1,0 +1,121 @@
+
+services:
+  db:
+    image: pgvector/pgvector:pg15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=platform
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  init:
+    build: ./backend
+    command: alembic upgrade head
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/platform
+    depends_on:
+      db:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/platform
+      - REDIS_URL=redis://redis:6379/0
+      - APP_ENV=dev
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/krafton-test-2fbde972e8b7.json
+      - GCP_PROJECT_ID=krafton-test
+      - GCP_REGION=us-central1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      init:
+        condition: service_completed_successfully
+    volumes:
+      - .:/workspace
+      - ./backend:/app
+      - ./storage:/app/storage
+      - ./backend/credentials:/app/credentials # Unified credentials directory
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  worker:
+    build: ./backend
+    command: celery -A app.worker.celery_app worker --loglevel=info -Q main_queue
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/platform
+      - REDIS_URL=redis://redis:6379/0
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/krafton-test-2fbde972e8b7.json
+      - GCP_PROJECT_ID=krafton-test
+      - GCP_REGION=us-central1
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
+      init:
+        condition: service_completed_successfully
+    volumes:
+      - .:/workspace
+      - ./backend:/app
+      - ./storage:/app/storage
+      - ./backend/credentials:/app/credentials
+
+  worker-analysis:
+    build: ./backend
+    command: celery -A app.worker.celery_app worker --loglevel=info -Q analysis_queue --concurrency=2
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/platform
+      - REDIS_URL=redis://redis:6379/0
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/krafton-test-2fbde972e8b7.json
+      - GCP_PROJECT_ID=krafton-test
+      - GCP_REGION=us-central1
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/workspace
+      - ./backend:/app
+      - ./storage:/app/storage
+      - ./backend/credentials:/app/credentials
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - INTERNAL_API_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+volumes:
+  postgres_data:

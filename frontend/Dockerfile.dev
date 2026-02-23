@@ -1,0 +1,21 @@
+FROM node:20-alpine AS base
+
+RUN apk add --no-cache git
+
+WORKDIR /app
+
+# package.json과 package-lock.json을 먼저 복사
+COPY package*.json ./
+
+# .next 디렉토리 미리 생성 및 node 사용자 권한 부여
+RUN mkdir -p /app/.next && chown -R node:node /app
+
+USER node
+
+RUN npm install
+
+# 나머지 모든 파일을 복사 (.vscode, .devcontainer 포함)
+COPY --chown=node:node . .
+
+# 디버그를 위해 바로 실행하지 않고 대기하도록 설정
+CMD ["sleep", "infinity"]

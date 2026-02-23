@@ -1,0 +1,31 @@
+{
+  "name": "Frontend Development (Next.js)",
+  "build": {
+    "dockerfile": "../Dockerfile.dev",
+    "context": ".."
+  },
+  "forwardPorts": [
+    3000
+  ],
+  "containerEnv": {
+    "NEXT_PUBLIC_API_URL": "http://localhost:8000",
+    "INTERNAL_API_URL": "http://backend:8000"
+  },
+  "workspaceFolder": "/workspaces/test_kr/frontend",
+  "postCreateCommand": "git config --global --add safe.directory /workspaces/test_kr",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dsznajder.es7-react-js-snippets",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "remoteUser": "node"
+}
